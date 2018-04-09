@@ -1,5 +1,7 @@
 docker/ssh/
-docker/data/*
-docker/apache/log/*
+docker/data/db/
+docker/apache/log/
+docker/php/log/
+!docker/data/db/.gitkeep
 !docker/apache/log/.gitkeep
-docker/php/log/*
+!docker/php/log/.gitkeep
