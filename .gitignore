@@ -1,0 +1,5 @@
+docker/ssh/
+docker/data/*
+docker/apache/log/*
+!docker/apache/log/.gitkeep
+docker/php/log/*

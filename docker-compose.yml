@@ -1,0 +1,75 @@
+# Incluir en /etc/hosts: 127.0.0.1  grayskull.local grayskull-gestion.local
+# mkdir -p ~/NAS/grayskull  //para crear NAS en la Home del usuario
+# mkdir /home/$USER/.composer para cache de composer
+# sudo setfacl -R -m u:www-data:rwx -m u:`whoami`:rwx var/cache var/logs
+# sudo setfacl -dR -m u:www-data:rwx -m u:`whoami`:rwx var/cache var/logs
+# chmod 600 ./docker/ssh/id_rsa
+# .gitignore: docker/apache/log/*  docker/php/log/*
+
+version: '3'
+
+services:
+
+#  grayskull-redis:
+#    image: redis:latest
+#    container_name: grayskull-redis
+#    ports:
+#      - "127.0.0.1:6379:6379"
+
+  grayskull-mysql:
+    image: mysql:5.7
+    container_name: grayskull-mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=grayskull
+      - MYSQL_DATABASE=grayskulldb
+      - MYSQL_USER=grayskull
+      - MYSQL_PASSWORD=grayskull
+    ports:
+      - "3306:3306"
+    volumes:
+      - "./docker/data/db/grayskullmysql:/var/lib/mysql"
+    networks:
+      - isolated-grayskull-nw
+
+  grayskull-apache:
+    container_name: grayskull-apache
+    image: sgadpsf/apache-2.4.10:latest
+    ports:
+      - "127.0.0.1:80:80"
+      - "127.0.0.1:443:443"
+
+    volumes:
+      - .:/var/www/html/:rw
+      - ./docker/apache/log:/var/log/apache2:rw
+      - ./docker/apache/vhost:/etc/apache2/sites-available:rw
+
+    environment:
+        - VIRTUALHOST=grayskull.local
+        - VIRTUALIAS=grayskull-gestion.local
+    networks:
+      - isolated-grayskull-nw
+
+  grayskull-php:
+    container_name: grayskull-php
+    hostname: grayskull-php
+    image: sgadpsf/php-fpm-7.2:latest
+    volumes:
+      - .:/var/www/html/:rw
+      - ./docker/php/log/php5-fpm:/var/log/php5-fpm:rw
+      - /home/$USER/NAS/grayskull:/NAS/grayskull:rw
+      - /home/$USER/.composer:/var/www/.composer:rw
+      - ./docker/ssh/:/var/www/.ssh
+      - ./docker/php/conf/30-custom.ini:/usr/local/etc/php/conf.d/30-custom.ini
+#    environment:
+#      - http_proxy={proxy}
+#      - https_proxy={proxy}
+#      - no_proxy={no_proxy}
+    networks:
+      - isolated-grayskull-nw
+    dns:
+      - ip_dns1
+      - ip_dns2
+      - ip_dns3
+
+networks:
+  isolated-grayskull-nw:
