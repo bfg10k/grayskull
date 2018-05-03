@@ -19,7 +19,7 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - "./docker/data/db/grayskullmysql:/var/lib/mysql"
+      - "~/.projects_metadata/grayskull/docker/data/db/grayskullmysql:/var/lib/mysql"
     networks:
       - isolated-grayskull-nw
 
@@ -32,7 +32,7 @@ services:
 
     volumes:
       - .:/var/www/html/:rw
-      - ./docker/apache/log:/var/log/apache2:rw
+      - ~/.projects_metadata/grayskull/docker/apache/log:/var/log/apache2:rw
       - ./docker/apache/vhost:/etc/apache2/sites-available:rw
 
     environment:
@@ -47,10 +47,10 @@ services:
     image: sgadpsf/php-fpm-7.2:latest
     volumes:
       - .:/var/www/html/:rw
-      - ./docker/php/log/php5-fpm:/var/log/php5-fpm:rw
-      - /home/$USER/NAS/grayskull:/NAS/grayskull:rw
-      - /home/$USER/.composer:/var/www/.composer:rw
-      - ./docker/ssh/:/var/www/.ssh
+      - ~/.projects_metadata/grayskull/docker/php/log/php5-fpm:/var/log/php5-fpm:rw
+      - ~/.projects_metadata/grayskull/NAS/grayskull:/NAS/grayskull:rw
+      - ~/.projects_metadata/grayskull/.composer:/var/www/.composer:rw
+      - ~/.ssh/:/var/www/.ssh
       - ./docker/php/conf/30-custom.ini:/usr/local/etc/php/conf.d/30-custom.ini
 #    environment:
 #      - http_proxy={proxy}
